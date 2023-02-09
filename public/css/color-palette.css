@@ -1,0 +1,23 @@
+:root{
+	--primus-orange: #f58220;
+
+	--footer-black: #282828;
+	--success: #28b661;
+	--weakgrey: #e4e4e4;
+
+	/*color schemes*/
+	--primary: #367bf5;
+	--success: #2fa84f;
+	--warning: #fbbc05;
+	--danger: #c12938;
+
+	--primary-shade: #72a2f8;
+	--danger-shade: #ff6288;
+	--success-shade: #60bcbc;
+
+	--faint-primary: #f2f6fa;
+	--faint-success: #dcefe5;
+	--faint-warning: #f8f3bb;
+	--faint-danger: #f4e2dd;
+	--faint-orange: #eae4df;
+}

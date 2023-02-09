@@ -1,0 +1,904 @@
+<template>
+<div>
+    <div v-if="page_status == 404">
+        <Page404 ></Page404>
+    </div>
+    <div v-else class="row">
+        <div :class="{ 'col-lg-12': fullscreen, 'col-lg-6 offset-lg-3': !fullscreen }">
+            <div class="card">
+            <div class="card-body">
+                <div style="padding:10px 0px; text-align:center;">
+                    
+                    <img id="avatar-preview" @click="browseFile('#avatar-browser')" :src="avatar" v-bind:class="{'editable' : editable }">
+                    <input @change="previewFile()" style="position:fixed; top:-100px; left:-100px; opacity:0;" id="avatar-browser" type="file">
+
+                    <h4 style="margin-top:10px;">{{ user.first_name }} {{ user.last_name }}</h4>
+                </div>
+
+                <template v-if="adminMessage.show">
+                    <div class="admin-message" :class="{'message-wrap': adminMessage.show_options }">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div><p></p></div>
+                            <div class="msg-btn-tab">
+                                <button @click="toggleAdminMsg(1)" class="btn btn-primary" style="border-top-right-radius: 0; border-bottom-right-radius: 0">Send Mail</button>
+                                <button @click="toggleAdminMsg(2)" class="btn btn-primary" style="border-radius: 0">Send SMS</button>
+                                <button @click="toggleAdminMsg(3); messageHistory();" class="btn btn-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0">Msg. History</button>
+                            </div>
+                            <div @click="resetToggleAdminMsg()" style="cursor: pointer;"><i v-if="adminMessage.show_options"  style="font-size: 15px;" class="las la-times"></i></div>
+                        </div>
+                        <div v-show="adminMessage.show_options" id="msg-tabs" class="mt-3">
+                            <div class="msg-tab">
+                                <form>
+                                    <input v-model="adminMessage.formdata.subject" class="form-control mb-2" placeholder="Subject" />
+                                    <textarea v-model="adminMessage.formdata.message" class="form-control mt-2 mb-2" placeholder="Message"></textarea>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="d-flex">
+                                            <button @click="resetToggleAdminMsg()" class="btn btn-danger btn-sm mr-1" type="button">Cancel</button>
+                                            <button @click="sendMessage('mail')" class="btn btn-success btn-sm" type="button">Send</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="msg-tab">
+                                <form>
+                                    <textarea  v-model="adminMessage.formdata.message" class="form-control mb-2" placeholder="Message"></textarea>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="d-flex">
+                                            <button @click="resetToggleAdminMsg()" class="btn btn-danger btn-sm mr-1" type="button">Cancel</button>
+                                            <button @click="sendMessage('sms')" class="btn btn-success btn-sm" type="button">Send</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="msg-tab">
+                                <table class="table table-bordered mb-0 table" style="background: #fff">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Message</th>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(message, index) in msg_history" :key="index">
+                                            <td width="150">
+                                                <span style="width: 150px;" class="d-block text-ellipsis">{{ message.mail.subject }}</span>
+                                            </td>
+                                            <td width="200">
+                                                <span style="width: 200px;" class="d-block text-ellipsis">{{ message.mail.message }}</span>
+                                            </td>
+                                            <td width="50" class="text-nowrap">
+                                                <div style="width: 50px">
+                                                    <span v-if="message.mail.is_email" class="badge badge-success">Email</span>
+                                                    <span v-if="message.mail.is_sms" class="badge badge-warning">SMS</span>
+                                                </div>
+                                            </td>
+                                            <td width="70">
+                                                <div style="width: 70px">{{ message.mail.created_at | MDY }}</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-tabs nav-justified">
+                            <li class="nav-item"><a class="nav-link active" style="cursor: pointer;">Personal Information</a></li>
+                            <li class="nav-item"><a class="nav-link" style="cursor: pointer;">Attachments</a></li>
+                            <li class="nav-item"><a class="nav-link" style="cursor: pointer;">Core Competencies</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane p-3 active"><br>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table-nowrap mb-0 table" v-bind:class="{' table-hover' : editable}">
+                                                <tbody>
+                                                <tr>
+                                                    <th width="140" scope="row">Full Name :</th>
+                                                    <td class="inline-edit" v-bind:class="{'editing' : inline_groups.fullname.editing}">
+                                                        <div v-if="editable" @click="toggleInlineEdit('fullname', inline_groups.fullname)" class="icon-pencil"><i class="bx bx-pencil"></i></div>
+
+                                                        <span v-if="!inline_groups.fullname.editing">{{ user.first_name }} {{ user.last_name }}</span>
+                                                        <div v-else>
+                                                            <input class="form-control" type="text" v-model="inline_groups.fullname.data.first_name">
+                                                            <input class="form-control" type="text" v-model="inline_groups.fullname.data.last_name">
+                                                            <div class="actions">
+                                                                <button @click="saveInline('fullname',inline_groups.fullname)" class="btn btn-primary btn-sm waves-effect waves-light" role="button">Save</button>
+                                                                <button @click="toggleInlineEdit('fullname',inline_groups.fullname)" class="btn btn-light btn-sm waves-effect waves-light" role="button">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th width="140" scope="row">Mobile :</th>
+                                                    <td class="inline-edit" v-bind:class="{'editing' : inline_groups.phone.editing}">
+                                                        <div v-if="editable" @click="toggleInlineEdit('phone', inline_groups.phone)" class="icon-pencil"><i class="bx bx-pencil"></i></div>
+
+                                                        <span v-if="!inline_groups.phone.editing">{{ user.phone }}</span>
+                                                        <div v-else>
+                                                            <input class="form-control" type="text" v-model="inline_groups.phone.data.phone">
+                                                            <div class="actions">
+                                                                <button @click="saveInline('phone',inline_groups.phone)" class="btn btn-primary btn-sm waves-effect waves-light" role="button">Save</button>
+                                                                <button @click="toggleInlineEdit('phone',inline_groups.phone)" class="btn btn-light btn-sm waves-effect waves-light" role="button">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th width="140" scope="row">Email Address :</th>
+                                                    <td class="inline-edit" v-bind:class="{'editing' : inline_groups.email.editing}">
+                                                        <div v-if="editable" @click="toggleInlineEdit('email', inline_groups.email)" class="icon-pencil"><i class="bx bx-pencil"></i></div>
+
+                                                        <span v-if="!inline_groups.email.editing">{{ user.email }}</span>
+                                                        <div v-else>
+                                                            <input class="form-control" type="text" v-model="inline_groups.email.data.email">
+                                                            <div class="actions">
+                                                                <button @click="saveInline('email',inline_groups.email)" class="btn btn-primary btn-sm waves-effect waves-light" role="button">Save</button>
+                                                                <button @click="toggleInlineEdit('email',inline_groups.email)" class="btn btn-light btn-sm waves-effect waves-light" role="button">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <th width="140" scope="row">Date Available :</th>
+                                                    <td class="inline-edit" v-bind:class="{'editing' : inline_groups.date_available.editing}">
+                                                        <div v-if="editable" @click="toggleInlineEdit('date_available', inline_groups.date_available)" class="icon-pencil"><i class="bx bx-pencil"></i></div>
+
+                                                        <span v-if="!inline_groups.date_available.editing">{{ resume.date_available }}</span>
+                                                        <div v-else>
+                                                            <input class="form-control" type="date" v-model="inline_groups.date_available.data.date_available">
+                                                            <div class="actions">
+                                                                <button @click="saveInline('date_available',inline_groups.date_available)" class="btn btn-primary btn-sm waves-effect waves-light" role="button">Save</button>
+                                                                <button @click="toggleInlineEdit('date_available',inline_groups.date_available)" class="btn btn-light btn-sm waves-effect waves-light" role="button">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th width="140" scope="row">Location :</th>
+                                                    <td class="inline-edit" v-bind:class="{'editing' : inline_groups.location.editing}">
+                                                        <div v-if="editable" @click="toggleInlineEdit('location', inline_groups.location)" class="icon-pencil"><i class="bx bx-pencil"></i></div>
+
+                                                        <span v-if="!inline_groups.location.editing">{{ resume.location }}</span>
+                                                        <div v-else>
+                                                            <input class="form-control" type="text" v-model="inline_groups.location.data.location">
+                                                            <div class="actions">
+                                                                <button @click="saveInline('location',inline_groups.location)" class="btn btn-primary btn-sm waves-effect waves-light" role="button">Save</button>
+                                                                <button @click="toggleInlineEdit('location',inline_groups.location)" class="btn btn-light btn-sm waves-effect waves-light" role="button">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th width="140" scope="row">Cotent :</th>
+                                                    <td class="inline-edit" v-bind:class="{'editing' : inline_groups.content.editing}">
+                                                        <div v-if="editable" @click="toggleInlineEdit('content', inline_groups.content)" class="icon-pencil"><i class="bx bx-pencil"></i></div>
+
+                                                        <span v-show="!inline_groups.content.editing">{{ resume.content }}</span>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div v-show="inline_groups.content.editing">
+                                                <textarea id="summernote" v-model="inline_groups.content.data.content"></textarea>
+                                                
+                                                <div style="padding-top:10px; text-align:right;" class="actions">
+                                                    <button @click="saveInline('content',inline_groups.content)" class="btn btn-primary btn-sm waves-effect waves-light" role="button">Save</button>
+                                                    <button @click="toggleInlineEdit('content',inline_groups.content)" class="btn btn-light btn-sm waves-effect waves-light" role="button">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane p-3"><br>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-nowrap table-centered table-hover mb-0 table">
+                                                <tbody>
+
+                                                    <tr>
+                                                        <td style="width: 45px;">
+                                                            <div class="avatar-sm"><span class="avatar-title rounded-circle bg-soft-primary font-size-24"><i class="bx bxs-file-doc"></i></span></div>
+                                                        </td>
+                                                        <td>
+                                                            <div v-if="file_resume" @click="browseFile('#file-resume-browser')">
+                                                                <h5 class="font-size-14 mb-1"><a class="text-dark" href="javascript:void(0);">
+                                                                    Resume: {{ file_resume.original_name }}</a>
+                                                                    <input @change="startUploadResume()" style="position:fixed; top:-100px; left:-100px; opacity:0;" id="file-resume-browser" type="file">
+                                                                </h5>
+                                                                <small>{{ humanFileSize(file_resume.size) }}</small>
+                                                            </div>
+                                                            <div v-if="!file_resume" @click="browseFile('#file-resume-browser')">
+                                                                <h5 class="font-size-14 mb-1">
+                                                                    <a class="text-dark" href="javascript:void(0);">Attach your Resume (Optional)</a>
+                                                                    <input @change="startUploadResume()" style="position:fixed; top:-100px; left:-100px; opacity:0;" id="file-resume-browser" type="file">
+                                                                </h5>
+                                                                <small>Click to Upload</small>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div v-if="file_resume" class="text-right">
+                                                                <a class="text-dark" href="javascript:void(0)"><i class="bx bx-download h3 m-0"></i></a>
+                                                                &nbsp;
+                                                                <a class="text-dark" href="javascript:void(0)"><i class="bx bx-x h3 m-0"></i></a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr>
+                                                        <td style="width: 45px;">
+                                                            <div class="avatar-sm"><span class="avatar-title rounded-circle bg-soft-primary font-size-24"><i class="bx bxs-file-doc"></i></span></div>
+                                                        </td>
+                                                        <td>
+                                                            <div v-if="file_tickets"  @click="browseFile('#file-tickets-browser')">
+                                                                <h5 class="font-size-14 mb-1"><a class="text-dark" href="javascript:void(0);">
+                                                                    Resume: {{ file_tickets.original_name }}</a>
+                                                                    <input @change="startUploadTickets()" style="position:fixed; top:-100px; left:-100px; opacity:0;" id="file-tickets-browser" type="file">
+                                                                </h5>
+                                                                <small>{{ humanFileSize(file_tickets.size) }}</small>
+                                                            </div>
+                                                            <div v-if="!file_tickets"  @click="browseFile('#file-tickets-browser')">
+                                                                <h5 class="font-size-14 mb-1">
+                                                                    <a class="text-dark" href="javascript:void(0);">Attach your Resume (Optional)</a>
+                                                                    <input @change="startUploadTickets()" style="position:fixed; top:-100px; left:-100px; opacity:0;" id="file-tickets-browser" type="file">
+                                                                </h5>
+                                                                <small>Click to Upload</small>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div v-if="file_tickets" class="text-right">
+                                                                <a class="text-dark" href="javascript:void(0)"><i class="bx bx-download h3 m-0"></i></a>
+                                                                &nbsp;
+                                                                <a class="text-dark" href="javascript:void(0)"><i class="bx bx-x h3 m-0"></i></a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane p-3"><br>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div v-if="editable" id="accordion">
+                                            <template v-for="(subcategory, index) in subcategories" >
+                                            <div :key="'collapse-' + index" class="card mb-1 shadow-none">
+                                                <div class="card-header" :id="'heading-' + index">
+                                                    <h6 class="m-0">
+                                                        <a style="font-weight: 600; display:block;" :href="'#collapse-' + index" class="text-dark" data-toggle="collapse"
+                                                                aria-expanded="true"
+                                                                aria-controls="collapseOne">
+                                                            {{ subcategory.name }}
+                                                        </a>
+                                                    </h6>
+                                                </div>
+
+                                                <div :id="'collapse-' + index" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div v-for="(type, index) in subcategory.job_types" :key="'type-' + index"  class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                                                <div class="form-check mb-3">
+                                                                    <input @click="toggleSkill(type.id)" class="form-check-input" type="checkbox" value="" :id="'type-' + index" :checked="isSkillSelected(type.id)">
+                                                                    <label class="form-check-label" :for="'type-' + index">
+                                                                        {{ type.job_type.name }}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            
+                                            </div>
+                                            </template>
+                                        </div>
+                                        <div v-else>
+                                            
+                                            <template v-for="(subcategory, index) in subcategories" >
+                                                <div :key="index">
+                                                    <div style="font-size:14px; color:#000; font-weight:600; margin-bottom:10px;">{{ subcategory.name }}</div>
+                                                    <div style="padding:10px;">
+                                                        <span v-for="(type, index) in subcategory.job_types" :key="'type-' + index"  v-show="isSkillSelected(type.job_type_id)" style="display:inline-block; margin-right:5px; margin-bottom:5px; font-weight:600; font-size:12px; padding:5px 10px;" class="badge badge-warning" >{{ type.job_type.name }}</span>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+</template>
+
+<style>
+.inline-edit { position:relative; cursor:pointer; }
+.inline-edit .form-control {margin-bottom:5px; }
+.inline-edit .icon-pencil { display:none; position:absolute; top:8px; right:10px; font-size:18px; }
+.inline-edit:hover:not(.editing) .icon-pencil { display:inline-block; }
+
+.inline-edit .actions { text-align:right; padding:10px 5px; }
+
+img.editable { cursor:pointer; } 
+#avatar-preview {  width:120px; height:120px; border:1px solid #efefef; padding:5px; border-radius:50%; }
+</style>
+<script>
+import Page404 from '../layouts/Page404'
+import moment from 'moment'
+
+export default {
+    name: 'user-candidates',
+    props: ['properties'],
+     data: function () {
+        return {
+            page_status: 200,
+            error: false,
+            fullscreen: false,
+            isMessageOpen: false,
+            subcategories: [],
+            skills: [],
+            msg_history: [],
+            
+            avatar: '/images/worker-placeholder.jpg',
+            file_resume: null,
+            file_tickets: null,
+            adminMessage: {
+                show: false,
+                show_options: false,
+                tab_sms: false,
+                tab_mail: false,
+
+                formdata: {
+                    id: null,
+                    subject: '',
+                    message: '',
+                    is_sms: false,
+                    is_email: false,
+                    is_from_message_center: false,
+                }
+            },
+            resume: {
+                date_available: '',
+                location: '',
+                content: '',
+            },
+            user: {
+                first_name: '',
+                last_name: '',
+                email: '',
+                phone: '',
+            },
+            user_id: null,
+            inline_groups : {
+                fullname: {
+                    url: 'users/candidate/profile',
+                    editing: false,
+                    data: {
+                        first_name: '',
+                        last_name: '',
+                    }
+                },
+                phone: {
+                    url: 'users/candidate/profile',
+                    editing: false,
+                    data: {
+                        phone: '',
+                    }
+                },
+                email: {
+                    url: 'users/candidate/profile',
+                    editing: false,
+                    data: {
+                        email: '',
+                    }
+                },
+                location: {
+                    url: 'users/resume/inline',
+                    editing: false,
+                    data: {
+                        location: '',
+                    }
+                },
+                date_available: {
+                    url: 'users/resume/inline',
+                    editing: false,
+                    data: {
+                        date_available: '',
+                    }
+                },
+                content: {
+                    url: 'users/resume/inline',
+                    editing: false,
+                    data: {
+                        content: '',
+                    }
+                },
+
+            },
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Authorization': 'Bearer ' + localStorage.getItem('KX-PRIMUS')
+            },
+        }
+    },
+    computed: {
+        auth: function () {
+            return this.$store.getters.getAuthenticatedUser
+        },
+        editable: function () {
+            var scope = this
+            if (scope.auth && scope.auth.id == scope.resume.user_id || scope.auth.type == 'Admin') {
+                return true
+            } else {
+                return false
+            }
+        }
+    },
+    components: {
+        Page404
+    },
+    filters: {
+        fromNow: function (date) {
+            return moment(date).fromNow();
+        },
+        calendar: function (date) {
+            return moment(date).calendar();
+        },
+        MDY: function (date) {
+            return moment(date).format('MM/DD/yyyy');
+        }
+    },
+    methods: {
+        toggleAdminMsg: function (number) {
+            var scope = this
+
+            scope.adminMessage.show_options = true
+
+            // tab button
+            $(`.msg-btn-tab button`).removeClass('active')
+            $(`.msg-btn-tab button:nth-child(${number})`).addClass('active')
+
+            // tab
+            $(`#msg-tabs .msg-tab`).removeClass('active')
+            $(`#msg-tabs .msg-tab:nth-child(${number})`).addClass('active')
+        },
+        resetToggleAdminMsg: function() {
+            var scope = this
+            scope.adminMessage.show_options = false
+            $('.msg-btn-tab button').removeClass('active')
+
+            scope.adminMessage.formdata.subject = ''
+            scope.adminMessage.formdata.message = ''
+        },
+        isSkillSelected: function (id) {
+            var scope = this
+            return scope.skills.includes(id);
+        },
+        toggleSkill: function (id) {
+            var scope = this
+
+            if (!scope.isSkillSelected(id)) {
+                scope.skills.push(id)
+                scope.POST('users/resume/skill/' + id, {user_id: scope.user_id}).then(res => {})
+            } else {
+                const index = scope.skills.indexOf(id);
+                scope.skills.splice(index, 1);
+                scope.DELETE('users/resume/skill/' + id, {user_id: scope.user_id}).then(res => {})
+            }
+            
+        },
+        humanFileSize: function(size) {
+            var i = Math.floor( Math.log(size) / Math.log(1024) );
+            return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+        },
+        getSubcategories: function () {
+            var scope = this
+            scope.subcategories = []
+            var response = scope.GET('job-subcategories',scope.formdata).then(res => {
+                scope.subcategories = res.rows
+            })
+        },
+        toggleInlineEdit: function (group,inline_group) {
+            var scope = this
+            inline_group.editing = !inline_group.editing
+            if (group == 'fullname') {
+                inline_group.data.first_name = scope.user.first_name
+                inline_group.data.last_name = scope.user.last_name
+            } else if (group == 'phone') {
+                inline_group.data.phone = scope.user.phone
+            } else if (group == 'email') {
+                inline_group.data.email = scope.user.email 
+            } else if (group == 'location') {
+                inline_group.data.location = scope.resume.location
+            } else if (group == 'date_available') {
+                inline_group.data.date_available = scope.resume.date_available
+            } else if (group == 'content') {
+                inline_group.data.content = scope.resume.content
+                 $('#summernote').summernote('code', scope.resume.content)
+            }
+        },
+        saveInline: function(group, inline_group) {
+            var scope = this
+
+            var data = inline_group.data
+            var url = inline_group.url
+
+            data.field = group
+
+            if (data.field == 'content') {
+                data.content = $('#summernote').summernote('code');
+            }
+
+            data.user_id = scope.user_id
+            scope.PUT(url, data).then(res => {
+                if (res.success) {
+                    if(res.userprofile){
+                        scope.user = res.data
+                    }else{
+                        scope.resume = res.data
+                    }
+                    scope.toggleInlineEdit(group,inline_group)
+                    alert(res.message)
+                } else {
+                    alert(res.message)
+                }
+            })
+        },
+        previewFile: function(){
+            var scope = this
+            var file = $("#avatar-browser").get(0).files[0];
+
+            if (!scope.editable) {
+                return
+            }
+            
+            if(file){
+                var reader = new FileReader();
+                reader.onload = function(){
+                    $("#avatar-preview").attr("src", reader.result);
+                }
+                reader.readAsDataURL(file);
+                scope.startUploadAvatar(file);
+            }
+        },
+        startUploadAvatar: function (file) {
+            var scope = this
+            var avatar = file
+
+        
+            var formData = new FormData();
+            formData.append('file', avatar);
+            formData.append('user_id', scope.user_id);
+
+            scope.error = false
+            
+            $.ajax({
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                            if (percentComplete === 1) {
+                                $('.progress').addClass('hide');
+                            }
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: 'POST',
+                url: "/api/users/resume/avatar",
+                enctype: 'multipart/form-data',
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                headers: scope.headers,
+                data:  formData,
+                success: function (res) {
+                    alert(res.message)
+                },
+                error: function(res) {
+                    
+                    var response = res.responseJSON
+                    response.code = res.status
+
+                    scope.error = response.message
+
+                    $('html, body').animate({
+                        scrollTop: $(document).find("#resume-error").offset().top - 70
+                    }, 500);
+                }
+            });
+        },
+        startUploadResume: function () {
+            var scope = this
+            
+            var file = $("#file-resume-browser").get(0).files[0];
+            if(!file){ return; }
+            
+            var reader = new FileReader();
+            
+            $(".file-resume-placeholder").html('Uploading ' + file.name);
+            
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('user_id', scope.user_id);
+         
+            scope.error = false
+
+            $.ajax({
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                            if (percentComplete === 1) {
+                                $('.progress').addClass('hide');
+                            }
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: 'POST',
+                url: "/api/users/resume/upload-resume",
+                enctype: 'multipart/form-data',
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                headers: scope.headers,
+                data:  formData,
+                success: function (response ) {
+                    $(".file-resume-placeholder").html('Resume: ' + file.name);
+                    scope.file_resume = response .data
+                    alert(response.message)
+                },
+                error: function(res) {
+                    
+                    var response = res.responseJSON
+                    response.code = res.status
+
+                    scope.error = response.message
+
+                    alert(response.message)
+                }
+            });
+        },
+        startUploadTickets: function () {
+            var scope = this
+            
+            var file = $("#file-tickets-browser").get(0).files[0];
+            if(!file){ return; }
+            
+            var reader = new FileReader();
+            
+            $(".file-tickets-placeholder").html('Uploading ' + file.name);
+            
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('user_id', scope.user_id);
+
+            scope.error = false
+
+            $.ajax({
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                            if (percentComplete === 1) {
+                                $('.progress').addClass('hide');
+                            }
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: 'POST',
+                url: "/api/users/resume/upload-tickets",
+                enctype: 'multipart/form-data',
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                headers: scope.headers,
+                data:  formData,
+                success: function (res) {
+                    $(".file-tickets-placeholder").html('Tickets: ' + file.name);
+                    scope.file_tickets = res.data
+                },
+                error: function(res) {
+                    
+                    var response = res.responseJSON
+                    response.code = res.status
+
+                    scope.error = response.message
+
+                    $('html, body').animate({
+                        scrollTop: $(document).find("#resume-error").offset().top - 70
+                    }, 500);
+                }
+            });
+        },
+        browseFile: function(el) {
+            var scope = this
+            if (!scope.editable) {
+                return
+            }
+            $(el).trigger('click');
+        },
+        getResume: function (userID) {
+            var scope = this
+
+            scope.skills = []
+            var response = scope.GET("users/resume/" + userID).then(response => {
+                if (response.success) {
+                    scope.resume = response.data
+                    scope.avatar = ( response.data.avatar) ? response.data.avatar : scope.avatar 
+                    scope.file_resume = ( response.data.file_resume) ? response.data.file_resume : null
+                    scope.file_tickets = ( response.data.file_tickets) ? response.data.file_tickets : null
+                    scope.skills =  response.data.skills
+                }
+
+                scope.page_status = response.code
+                console.log(scope.resume)
+            })
+        },
+        getProfile: function () {
+            var scope = this
+
+            scope.GET('users/' + scope.user_id + '/profile').then(res => {
+                if(!res.success) {
+                    return scope.error = res.message
+                }
+                scope.user.first_name = res.data.first_name
+                scope.user.last_name = res.data.last_name
+                scope.user.email = res.data.email
+                scope.user.phone = res.data.phone
+            })
+        },
+
+        submitForm: function() {
+            var scope = this
+            scope.error = false
+            $.ajax({
+                url: "/api/users/resume",
+                type: "POST",
+                data: scope.resume,
+                headers: scope.headers,
+                success: function (response) {
+
+                    location.href = '/resume'
+                },
+                error: function(res) {
+                    
+                    var response = res.responseJSON
+                    response.code = res.status
+
+                    scope.error = response.message
+
+                    $('html, body').animate({
+                        scrollTop: $(document).find("#resume-error").offset().top - 70
+                    }, 500);
+                }
+            });
+        },
+        sendMessage: function (message_type) {
+            var scope = this
+            
+            scope.adminMessage.formdata.id = scope.user_id
+            if(message_type === 'mail') {
+                scope.adminMessage.formdata.is_sms = false
+                scope.adminMessage.formdata.is_email = true
+            }else if(message_type === 'sms'){
+                scope.adminMessage.formdata.is_sms = true
+                scope.adminMessage.formdata.is_email = false
+            }else{ return }
+
+            scope.POST('candidate/message', scope.adminMessage.formdata).then(res => {
+                if(!res.success) {
+                    alert('Oops! Something went wrong..')
+                } else {
+                    console.log(res)
+                }
+            })
+        },
+        messageHistory: function () {
+            var scope = this
+            
+            scope.GET('candidate/message-history', {'candidate' : scope.user_id}).then(res => {
+                if(!res.success) {
+                    alert('Oops! Something went wrong..')
+                } else {
+                    scope.msg_history = res.rows
+                    console.log('msg hs', scope.msg_history)
+                }
+            })
+        }
+    },
+    mounted() {
+        var scope = this
+
+        var userID = (scope.properties && scope.properties.candidate_id) ? scope.properties.candidate_id : scope.auth.id
+        scope.fullscreen = (scope.properties && scope.properties.fullscreen) ? scope.properties.fullscreen : false
+        scope.adminMessage.show = (scope.properties && scope.properties.adminMessage) ? scope.properties.adminMessage : false
+
+        scope.user_id = userID
+        scope.getResume(userID)
+        scope.getSubcategories()
+        scope.getProfile()
+        $('#summernote').summernote({height: 150})
+    }
+}
+</script>
+<style>
+.admin-message { margin-top: -10px; margin-bottom: 20px; }
+.admin-message.message-wrap { margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; padding: 20px; margin-bottom: 20px; background: #f8f9fa; }
+.admin-message .msg-btn-tab button { transition: .5s }
+.admin-message .msg-btn-tab button:nth-child(1),
+.admin-message .msg-btn-tab button:nth-child(2) { margin-right: 1px }
+.admin-message .msg-btn-tab button.active,
+.admin-message .msg-btn-tab button.active:focus,
+.admin-message .msg-btn-tab button.active:active {
+    box-shadow: none !important;
+    border-color: var(--primus-orange) !important;
+    transition: .5s
+}
+.admin-message .msg-btn-tab { display: flex; align-items: center; border-radius: 6px; }
+.admin-message .msg-tab { display: none; }
+.admin-message .msg-tab.active { display: block; }
+
+.admin-message textarea { height: 100px; }
+.text-ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>

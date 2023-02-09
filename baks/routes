@@ -1,0 +1,13 @@
+Route::get('/workers/recommendations', 'API\JobWorkerRecommendationController@index');
+Route::get('/workers/{jobPostID}/recommendations', 'API\JobWorkerRecommendationController@show');
+Route::post('/workers/{jobPostID}/recommendations', 'API\JobWorkerRecommendationController@save');
+
+Route::post('/workers/{jobPostID}/recommendations/{workerID}/accept', 'API\JobWorkerRecommendationController@accept');
+Route::post('/workers/{jobPostID}/recommendations/{workerID}/decline', 'API\JobWorkerRecommendationController@decline');
+
+Route::delete('/workers/{id}/recommendations', 'API\JobWorkerRecommendationController@delete');
+
+
+Route::get('/posts/{id}/applications', 'API\JobPostApplicationController@index');
+Route::post('/posts/{id}/applications', 'API\JobPostApplicationController@store');
+Route::delete('/posts/{id}/applications', 'API\JobPostApplicationController@delete');

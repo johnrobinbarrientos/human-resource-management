@@ -1,0 +1,341 @@
+/* resets */
+body { font-family: Montserrat; position: relative; padding-top: 80px; }
+h1, h2, h3,h4, h5 { font-family: Roboto; }
+p { font-size: 14px; }
+a, a:hover { text-decoration: none; }
+
+/** primus modules **/
+
+/*btns*/
+.pr-btn-fold 	   { padding: 8px 24px; font-family: Roboto; font-size: 24px; background: #000; color: #fff; letter-spacing: 3px; }
+.pr-btn-fold:hover { background: var(--primus-orange); color: #000; transition: .5s; }
+
+.pr-btn 	  { padding: 13px 18px; background: var(--primus-orange); font-weight: 500; color: #fff; border-radius: 3px; font-size: 13px; }
+.pr-btn:hover { background: #282828; color: #fff; transition: .5s; }
+
+.pr-btn-2	  { padding: 13px 18px; background: var(--weakgrey); font-weight: 600; color: #555; border-radius: 3px; font-size: 13px; }
+.pr-btn-2:hover { background: #333; color: #fff; transition: .5s; }
+
+.pr-btn-link 	   { position: relative; font-size: 13px; font-weight: 300; color: #909090; margin-bottom: 20px; line-height: 1.8em; transition: .4s; padding-bottom: 4px; }
+.pr-btn-link:hover { color: #fff; transition: .4s; }
+.pr-btn-link:before 	  { position: absolute; content: ''; display: block; width: 0; left: 0; bottom: 0; height: 2px; background: transparent; transition: .4s; border-radius: 3px; }
+.pr-btn-link:hover:before { width: 100%; transition: .4s; background: #26ae61; }
+
+.pr-btn-w-icon 		      { display: flex; align-items: center; transition: .2s; margin-bottom: 5px; }
+.pr-btn-w-icon i 		  { font-size: 10px; color: var(--primus-orange); }
+.pr-btn-w-icon span 	  { font-size: 13px; margin-left: 5px; color: #667; }
+.pr-btn-w-icon:hover span { color: var(--primus-orange); transition: .2s; }
+
+.pr-btn-w-icon-2 	   { padding: 13px 18px; background: var(--primus-orange); font-weight: 600; color: #fff; border-radius: 3px; font-size: 13px; display: flex; justify-content: center; width: fit-content; box-shadow: 0 4px 12px rgba(34,34,34, 0.25); }
+.pr-btn-w-icon-2 i	   { font-size: 18px; margin-right: 5px; }
+.pr-btn-w-icon-2:hover { background: #282828; color: #fff; transition: .5s; }
+
+.pr-btn-white 		{ background: #fff; color: #000; transition: .4s; }
+.pr-btn-white:hover { background: var(--primus-orange); color: #000; opacity: .84; transition: .4s; }
+
+/*blurbs*/
+.pr-blurb { display: flex; margin-bottom: 10px; }
+.pr-blurb i { font-size: 30px; color: var(--primus-orange); margin-right: 8px; }
+.pr-blurb .blurb-title { display: inline-block; font-weight: 600; font-size: 15px; margin-bottom: 5px; }
+.pr-blurb .blurb-desc { color: #667; }
+
+/*hr*/
+hr.pr-divider { width: 115px; border-bottom: 4px solid var(--primus-orange); margin: 15px 0px 25px 0px; }
+hr.pr-line 		{ border-top: 1px solid #ebebeb; margin-bottom: 40px; }
+hr.pr-line-dark { border-top: 1px solid #333; }
+hr.pr-line-white { border-top: 1px solid #fff; }
+hr.pr-line-grey { border-top: 1px solid #e0e0e0; }
+
+/*counter*/
+.pr-counter {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 10px;
+	background: #f8f8f8;
+	padding: 25px;
+}
+.pr-counter h5   { font-family: Montserrat; font-size: 15px; font-weight: normal; margin: 0; }
+.pr-counter span { color: #e5e5e5; font-size: 40px; font-weight: 500; line-height: 0; }
+.pr-counter-wrapper { margin-bottom: 0; }
+
+/*notification bar*/
+.notification-bar {
+	font-size: 14px;
+	background: #e9f7fe;
+	padding: 20px;
+	margin-bottom: 20px;
+	color: #4587a9
+}
+
+/*tab-group*/
+.pr-tab-group {	display:flex; justify-content: space-between; margin-bottom:20px; }
+.pr-tab-group .btn-primary { flex: 1; }
+
+
+/*job listings*/
+ul.pr-job-listings { padding-left: 0; }
+ul.pr-job-listings li 		{ list-style-type: none; }
+ul.pr-job-listings li:hover { background: #fafafa; transition: .1s; }
+
+ul.pr-job-listings li a {
+	display: flex;
+	padding: 25px;
+	border: 1px solid #e0e0e0;
+	border-left: 4px solid #e0e0e0;
+	border-radius: 4px;
+	transition: .1s;
+	color: unset;
+}
+ul.pr-job-listings li:nth-child(even) a 		   { border-left-color: transparent; }
+ul.pr-job-listings li.job .job-left				   { padding-right: 20px; }
+ul.pr-job-listings li.job .job-right 			   { width: 100%; display: flex; justify-content: space-between; }
+ul.pr-job-listings li.job .job-right > .other 	   { display: flex; align-items: center; }
+ul.pr-job-listings li.job .job-right > .other span { color: #333; font-size: 12px; }
+ul.pr-job-listings li.job .job-right > .description    {  }
+ul.pr-job-listings li.job .job-right > .description h4 { font-family: Montserrat; color: #333; font-size: 15px; font-weight: 400; margin-bottom: 10px; }
+ul.pr-job-listings li.job .job-right > .description > .more-details      { display: flex; flex-wrap: wrap; }
+ul.pr-job-listings li.job .job-right > .description > .more-details span { display: flex; align-items: center; color: #808080; font-size: 12px; margin-right: 12px; }
+ul.pr-job-listings li.job .job-right > .description > .more-details i	 { font-size: 20px; margin-right: 5px; color: #545b6294; }
+
+/*job spotlight*/
+.pr-job-spotlight { border: 1px solid #e0e0e0; background: #fdfdfd; border-radius: 4px; padding: 35px; margin-bottom: 20px; }
+.pr-job-spotlight > .header      { display: flex; align-items: center; margin-bottom: 20px; }
+.pr-job-spotlight > .header span { color: #282828; font-size: 10px; font-weight: 600; }
+.pr-job-spotlight > .header h4   { font-family: Montserrat; color: #333; font-size: 16px; font-weight: 400; margin-bottom: 0; margin-right: 10px }
+.pr-job-spotlight > .more-details 	    { display: flex; flex-wrap: wrap; margin-bottom: 20px; }
+.pr-job-spotlight > .more-details span { display: flex; align-items: center; color: #808080; font-size: 12px; margin-right: 12px; }
+.pr-job-spotlight > .more-details i    { color: #545b6294; font-size: 20px; margin-right: 5px; }
+.pr-job-spotlight p.pr-paragraph { width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/*testimonial*/
+.pr-testimonial { padding: 0 30px; text-align: center; }
+.pr-testimonial img  { margin-bottom: 15px; margin: 0 auto; }
+.pr-testimonial h4   { font-family: Montserrat; font-size: 22px; color: #333; }
+.pr-testimonial span { color: var(--primus-orange); margin-bottom: 10px; display: block; font-weight: 500; }
+.pr-testimonial p    { font-style: italic; }
+
+/** primus sub-modules **/
+.pr-title 			  { font-family: Montserrat; font-weight: 600; color: #333; font-size: 32px; line-height: 1.5em; }
+.pr-title.normal { font-weight: 400; font-size: 24px; margin-bottom: 25px; }
+.pr-title.small-light { font-weight: 400; font-size: 22px; margin-bottom: 25px; }
+.pr-title.smaller-light { font-weight: 400; font-size: 20px; margin-bottom: 30px; }
+.pr-title.footer { font-weight: 400; font-size: 14px; margin-bottom: 15px; }
+
+.pr-desc 	  		 { color: #665; font-weight: 600; line-height: 1.7em; margin-bottom: 25px; }
+.pr-desc.small-light { color: #888; font-weight: 300; font-size: 16px; }
+
+.pr-paragraph { font-size: 13px; color: #665; margin-bottom: 20px; line-height: 1.8em; }
+
+/* primus utilities */
+.lg-max-width { max-width: 1120px; }
+.fs-13 { font-size: 13px !important; }
+.c-665 { color: #665; }
+.c-fff { color: #fff !important; }
+.c-orange { color: var(--primus-orange); }
+.c-light-dark { color: #282828 !important; }
+
+.pr-border { border: 1px solid #e2e2e2; }
+.pr-container { padding: 30px; }
+.pr-container-inner { padding: 15px; }
+.pr-page-fold { padding: 55px 0; }
+.pr-page-content { padding: 50px 0; }
+.pr-img-block { display: block; width: 100%; margin-bottom: 20px; }
+
+.pr-flex-row   { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.pr-flex-col-3 { flex-basis: calc(25% - 20px); }
+
+.pr-slick-row {  }
+.pr-slick-col-3 { width: 33.333333%; }
+
+.bg-grey { background: #eee; }
+.bg-greylight { background: #f9f9f9; }
+.bg-greywhite { background: #f6f6f6; }
+.bg-white { background: #fff; }
+.bg-orange { background: var(--primus-orange); }
+
+/* slick styles */
+.slick-prev { left: 20px !important; }
+.slick-next { right: 20px !important; }
+.slick-prev, .slick-next {
+	z-index: 999 !important;
+	width: 40px !important;
+	height: 40px !important;
+}
+.slick-prev:before, .slick-next:before { font-size: 40px !important; }
+
+/** HEADER **/
+
+/* header wrappers */
+header {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.12);
+	background: #fff;
+	z-index: 111;
+}
+header .header-logo  { height: 75px; }
+header .header-inner { height: 80px; display: flex; justify-content: space-between; }
+header .header-left  { width: 200px; display: flex; align-items: center; border-right: 1px solid rgba(0,0,0,0.15); padding-right: 25px; }
+header .header-right { display: flex; align-items: center; width: 300px; border-left: 1px solid rgba(0,0,0,0.15); padding-left: 10px; }
+
+header .header-center { width: 100%; display: flex; align-items: center; padding: 0 10px; }
+header .header-center nav>ul>li { position: relative; cursor: pointer; padding: 10px 0; }
+header .header-center nav>ul>li:hover>a { color: var(--primus-orange); }
+
+/*nav dropdown*/
+header .header-center nav .dropdown:before {
+	content: "";
+    position: absolute;
+    left: 25px;
+    top: -5px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+	border-bottom: 5px solid #303030;
+}
+header .header-center nav .dropdown {
+	opacity: 0;
+	position: absolute;
+    top: 45px;
+	left: 10px;
+	display: block;
+	background-color: #303030;
+    box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.12);
+	border-radius: 3px;
+	width: 210px;
+	padding: 10px;
+	transition: .25s;
+	transform: translate3d(0,15px,0);
+	visibility: hidden;
+}
+header .header-center nav .dropdown>li { margin-bottom: 1px; }
+header .header-center nav .dropdown>li>a { color: #aaa; transition: .3s; }
+header .header-center nav .dropdown>li>a:hover { color: #fff; transition: .3s; }
+
+header .header-center nav li#findWork:hover .dropdown,
+header .header-center nav li#findWorkers:hover .dropdown { opacity: 1; transition: .25s; transform: translate3d(0,0,0); visibility: visible; }
+
+
+/* header items */
+header a 	   { padding: 0 10px; font-size: 12px; color: #444; font-weight: 500; }
+header a:hover { color: var(--primus-orange); }
+
+.header-center nav ul { display: flex; list-style-type: none; padding-left: 0; margin: 0; }
+
+.header-right .nav-item  	  { display: flex; align-items: center; transition: .2s; }
+.header-right .nav-item:hover { color: var(--success); transition: .2s; }
+.header-right .nav-item i     { font-size: 20px; margin-right: 3px; }
+
+
+/* header mobile-view */
+header .header-mobile-burger {
+	display: none;
+    align-items: center;
+    width: auto;
+    border-left: 1px solid rgba(0,0,0,0.15);
+    padding-left: 15px;
+}
+
+header .header-mobile-burger .burger {
+	width: 45px;
+	height: 45px;
+	font-size: 24px;
+	padding: 5px;
+	background: #eee;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 3px;
+}
+
+
+/** MAIN **/
+
+/* fold */
+.main-folds 			{ margin-bottom: 40px; }
+.main-fold 				{ height: 90vh; background-size: cover; background-position-x: center; }
+.main-fold.fold-slide-2 { background-position-y: -100px; }
+.main-fold-inner 		{ height: 100%; display: flex; align-items: center; }
+
+.main-title { font-size: 60px; font-weight: 900; color: #000; letter-spacing:2px; }
+.main-sub-title {
+	width: 50%;
+	font-size: 22px;
+	color: #000;
+	font-weight: 500;
+	letter-spacing: 0.2px;
+	margin-bottom: 25px;
+	line-height: 1.4em;
+	margin-bottom: 25px;
+}
+
+/* home page */
+.about-primus-workforce { padding: 40px 50px; margin-bottom: 40px; }
+.about-primus-workforce .grouped-btns { margin-bottom: 24px; }
+
+/** FOOTER **/
+footer { padding-top: 40px; padding-bottom: 1rem; background: var(--footer-black); }
+footer .pr-title { color: #fff; margin-bottom: 15px; }
+footer .pr-paragraph { color: #909090; }
+footer ul { padding-left: 0; }
+footer ul li { list-style-type: none; margin-bottom: 1px; }
+footer img.think-orion { width: 65px; }
+
+
+
+/** MEDIA QUERIES **/
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+
+}
+
+/* Small devices (landscape phones, less than 768px) */
+@media (max-width: 767.98px) {  }
+
+/* Medium devices (tablets, less than 992px) */
+@media (max-width: 991.98px) {
+	header .header-mobile-burger { display: flex; }
+	header .header-inner { justify-content: unset; }
+	header .header-left { margin-right: auto; padding-right: 0; border-right: none; }
+	header .header-center { display: none; }
+	header .header-right { width: auto; align-items: flex-start; flex-direction: column; justify-content: center; padding-left: 5px; padding-right: 5px; } 
+	header .header-right .nav-item:first-child { margin-bottom: 10px; }
+	
+	.main-title 	{ font-size: 29px; letter-spacing: 1px; }
+	.main-sub-title { font-size: 13px; letter-spacing: 0; width: 90%; }
+	
+	.pr-title { font-size: 29px; }
+	.pr-btn-fold { font-size: 16px; padding: 4px 12px; letter-spacing: 1px; }
+	.pr-btn-w-icon span { font-size: 14px; }
+	.pr-testimonial { padding: 0; }
+
+	.pr-page-fold    { padding: 55px 15px; }
+	.pr-page-content { padding: 50px 15px; }
+
+	.pr-flex-col-3 { flex-basis: calc(100% - 20px); }
+	.pr-counter-wrapper { margin-bottom: 20px; }
+
+	.about-primus-workforce 			  { padding: 30px; }
+	.about-primus-workforce .grouped-btns { margin-bottom: 30px; }
+	
+	ul.pr-job-listings li.job .job-left	{ display: none; }
+	ul.pr-job-listings li.job .job-right > .description > .more-details span,
+	.pr-job-spotlight > .more-details span { margin-bottom: 2px; }
+	.pr-job-spotlight p.pr-paragraph { width: 90%; }
+	
+	footer .pr-title.footer { font-size: 17px; }
+	footer .pr-paragraph, 
+	footer .pr-btn-link	{ font-size: 14px; }
+}
+
+/* Large devices (desktops, less than 1200px) */
+@media (max-width: 1199.98px) {  }
+
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {  }
